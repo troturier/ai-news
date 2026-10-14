@@ -1,8 +1,21 @@
 import { Markdown } from "@/components/markdown";
 import { ThemeIcon } from "@/components/icon";
+import { RevealEmail } from "@/components/reveal-email";
 
 /** Shared layout of the static pages (About, Legal): one icon per `##` section of the Markdown body. */
-export function StaticPage({ title, intro, body, icons }: { title: string; intro: string; body: string; icons: string[] }) {
+export function StaticPage({
+  title,
+  intro,
+  body,
+  icons,
+  contact,
+}: {
+  title: string;
+  intro: string;
+  body: string;
+  icons: string[];
+  contact?: { label: string; reveal: string }; // shown under the first section (click to reveal)
+}) {
   const sections = body.split(/^## /m).map((s) => s.trim()).filter(Boolean);
   return (
     <article className="mx-auto max-w-3xl">
@@ -21,6 +34,7 @@ export function StaticPage({ title, intro, body, icons }: { title: string; intro
               {heading}
             </h2>
             <Markdown>{rest.join("\n")}</Markdown>
+            {i === 0 && contact && <div className="prose prose-neutral mt-2 max-w-none dark:prose-invert"><RevealEmail {...contact} /></div>}
           </section>
         );
       })}

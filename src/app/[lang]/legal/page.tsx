@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { StaticPage } from "@/components/static-page";
 import { legalPage } from "@/content/legal";
 import { hasLocale } from "@/i18n/config";
+import { legal } from "@/lib/legal";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/legal">): Promise<Metadata> {
   const { lang } = await params;
@@ -13,5 +14,6 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/legal">): 
 export default async function LegalPage({ params }: PageProps<"/[lang]/legal">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
-  return <StaticPage {...legalPage[lang]} />;
+  const { contact, ...page } = legalPage[lang];
+  return <StaticPage {...page} contact={legal.contactEmail ? contact : undefined} />;
 }

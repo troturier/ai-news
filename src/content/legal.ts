@@ -1,16 +1,17 @@
 import type { Locale } from "@/i18n/config";
 import { REPO_URL, legal } from "@/lib/legal";
 
-const contactFr = legal.contactEmail ? `par e-mail à ${legal.contactEmail}` : `en ouvrant un ticket sur [${REPO_URL}/issues](${REPO_URL}/issues)`;
-const contactEn = legal.contactEmail ? `by e-mail at ${legal.contactEmail}` : `by opening an issue at [${REPO_URL}/issues](${REPO_URL}/issues)`;
+const contactFr = legal.contactEmail ? "par e-mail (adresse affichée dans la section « Éditeur du site »)" : `en ouvrant un ticket sur [${REPO_URL}/issues](${REPO_URL}/issues)`;
+const contactEn = legal.contactEmail ? "by e-mail (address shown in the \"Publisher\" section)" : `by opening an issue at [${REPO_URL}/issues](${REPO_URL}/issues)`;
 
 // building, server, copyright, user-shield, database, scale, share, cookie, clock, shield-check
 const ICONS = ["building", "server", "copyright", "user-shield", "database", "scale", "share", "cookie", "clock", "shield-check"];
 
 /** « Legal notice and privacy » page content (Markdown; same section/icon convention as the about page). */
-export const legalPage: Record<Locale, { title: string; intro: string; body: string; icons: string[] }> = {
+export const legalPage: Record<Locale, { title: string; intro: string; body: string; icons: string[]; contact: { label: string; reveal: string } }> = {
   fr: {
     icons: ICONS,
+    contact: { label: "Contact", reveal: "Afficher l'adresse e-mail" },
     title: "Mentions légales et confidentialité",
     intro: "Informations légales sur l'éditeur du site et sur le traitement de vos données personnelles (RGPD).",
     body: `
@@ -18,7 +19,7 @@ export const legalPage: Record<Locale, { title: string; intro: string; body: str
 
 - **Site** : AI News
 - **Éditeur et directeur de la publication** : ${legal.publisher ?? "particulier, dont l'identité est communiquée à l'hébergeur"}
-${legal.contactEmail ? `- **Contact** : ${legal.contactEmail}\n` : ""}- **Code source** : [${REPO_URL}](${REPO_URL})
+- **Code source** : [${REPO_URL}](${REPO_URL})
 
 ## Hébergement
 
@@ -86,6 +87,7 @@ Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'ef
   },
   en: {
     icons: ICONS,
+    contact: { label: "Contact", reveal: "Show e-mail address" },
     title: "Legal notice and privacy",
     intro: "Legal information about the site's publisher and about how your personal data is processed (GDPR).",
     body: `
@@ -93,7 +95,7 @@ Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'ef
 
 - **Site**: AI News
 - **Publisher and publication director**: ${legal.publisher ?? "an individual, whose identity is disclosed to the host"}
-${legal.contactEmail ? `- **Contact**: ${legal.contactEmail}\n` : ""}- **Source code**: [${REPO_URL}](${REPO_URL})
+- **Source code**: [${REPO_URL}](${REPO_URL})
 
 ## Hosting
 

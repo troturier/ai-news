@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, eq, gte } from "drizzle-orm";
+import { and, count, eq, gte, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
@@ -143,16 +143,21 @@ export async function deleteList(listId: string) {
 /* --------------------------- Comments --------------------------- */
 
 const COMMENTS_PER_MINUTE = 3;
+const REPORTS_PER_HOUR = 10;
 
 export async function addComment(articleId: string, body: string) {
   const u = await requireUser();
   const input = z.object({ articleId: id, body: z.string().trim().min(1).max(2000) }).parse({ articleId, body });
   await assertPublished(articleId);
   const since = new Date(Date.now() - 60_000);
-  const [{ n }] = await db.select({ n: count() }).from(comments)
-    .where(and(eq(comments.userId, u.id), gte(comments.createdAt, since)));
-  if (n >= COMMENTS_PER_MINUTE) throw new Error("rate_limited");
-  await db.insert(comments).values({ articleId: input.articleId, userId: u.id, body: input.body });
+  await db.transaction(async (tx) => {
+    // Transaction-scoped lock per user: parallel requests cannot all pass the count below.
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${u.id}))`);
+    const [{ n }] = await tx.select({ n: count() }).from(comments)
+      .where(and(eq(comments.userId, u.id), gte(comments.createdAt, since)));
+    if (n >= COMMENTS_PER_MINUTE) throw new Error("rate_limited");
+    await tx.insert(comments).values({ articleId: input.articleId, userId: u.id, body: input.body });
+  });
   revalidatePath("/", "layout");
 }
 
@@ -173,7 +178,19 @@ export async function reportContent(targetType: "article" | "comment", targetId:
     targetId: id,
     reason: z.string().trim().min(3).max(500),
   }).parse({ targetType, targetId, reason });
-  await db.insert(reports).values({ ...input, userId: u.id }).onConflictDoNothing();
+  if (input.targetType === "article") await assertPublished(input.targetId);
+  else {
+    const [c] = await db.select({ id: comments.id }).from(comments)
+      .where(and(eq(comments.id, input.targetId), eq(comments.status, "visible"))).limit(1);
+    if (!c) throw new Error("not_found");
+  }
+  await db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${"report:" + u.id}))`);
+    const [{ n }] = await tx.select({ n: count() }).from(reports)
+      .where(and(eq(reports.userId, u.id), gte(reports.createdAt, new Date(Date.now() - 3_600_000))));
+    if (n >= REPORTS_PER_HOUR) throw new Error("rate_limited");
+    await tx.insert(reports).values({ ...input, userId: u.id }).onConflictDoNothing();
+  });
 }
 
 /** "Hide read articles" preference (cookie: no sensitive data, valid for the whole site). */

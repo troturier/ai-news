@@ -11,7 +11,7 @@ import { discover } from "./discover";
 import { MODELS, UsageTracker } from "./llm";
 import { findImage } from "./image";
 import { assessPopularity, type Candidate } from "./popularity";
-import { canonicalUrl, slugify, titleSimilarity } from "./url";
+import { canonicalUrl, hostOf, slugify, titleSimilarity } from "./url";
 import { writeArticle } from "./write";
 
 export type RunOptions = {
@@ -24,6 +24,18 @@ const SIMILAR_TITLE = 0.6;
 const RECENT_DAYS = 14;
 
 type Log = Record<string, unknown>;
+
+/** Model-provided URLs: only valid http(s) addresses are kept (never `javascript:` or `data:`), canonicalised. */
+function safeCorroborating(urls: string[]) {
+  return urls.flatMap((u) => {
+    try {
+      const url = canonicalUrl(u);
+      return [{ url, title: url, publisher: hostOf(url) ?? url }];
+    } catch {
+      return [];
+    }
+  });
+}
 
 export async function runPipeline(opts: RunOptions) {
   const tracker = new UsageTracker();
@@ -132,7 +144,7 @@ export async function runPipeline(opts: RunOptions) {
                 canonicalUrl: url,
                 sources: [
                   { url, title: c.title, publisher: c.publisher },
-                  ...c.corroboratingUrls.map((u) => ({ url: u, title: u, publisher: new URL(u).hostname })),
+                  ...safeCorroborating(c.corroboratingUrls),
                 ],
                 tags: art.tags,
                 imageUrl: image?.url ?? null,

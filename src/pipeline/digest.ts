@@ -71,7 +71,7 @@ async function main() {
       stats.sent++;
       await new Promise((r) => setTimeout(r, 600)); // sending quota (Resend: 2 requests/s by default)
     } catch (e) {
-      stats.errors.push(`${u.email} : ${(e as Error).message}`);
+      stats.errors.push(`${u.id} : ${(e as Error).message}`);
     }
   }
   console.log(JSON.stringify(stats, null, 2));

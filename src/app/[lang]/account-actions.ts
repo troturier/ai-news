@@ -30,7 +30,11 @@ export async function updateAccount(raw: unknown) {
  * subscriptions, lists, reads, reactions, comments and reports.
  */
 export async function deleteAccount(confirmEmail: string) {
-  const u = await requireUser();
+  const session = await getSession();
+  if (!session) throw new Error("unauthorized");
+  // A stolen session cookie must not be enough to delete the account: require a sign-in from the last 10 minutes.
+  if (Date.now() - new Date(session.session.createdAt).getTime() > 10 * 60_000) throw new Error("reauth_required");
+  const u = session.user;
   if (confirmEmail.trim().toLowerCase() !== u.email.toLowerCase()) throw new Error("email_mismatch");
   if (u.role === "admin") {
     const [{ n }] = await db.select({ n: count() }).from(user).where(and(eq(user.role, "admin")));

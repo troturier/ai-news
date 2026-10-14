@@ -3,6 +3,20 @@ import remarkGfm from "remark-gfm";
 import type { Heading } from "@/lib/headings";
 import { SectionIcon } from "@/lib/section-icons";
 
+const hostOf = (raw: string) => {
+  try {
+    return new URL(raw).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return null;
+  }
+};
+
+function isAllowedLink(href: string | undefined, allowed: string[]) {
+  if (!href || !/^https?:\/\//i.test(href)) return false;
+  const h = hostOf(href);
+  return !!h && allowed.some((a) => h === a || h.endsWith(`.${a}`));
+}
+
 /**
  * The content comes from a model working on web pages: raw HTML is never
  * rendered (react-markdown ignores it by default, rehype-raw is not enabled)
@@ -11,7 +25,16 @@ import { SectionIcon } from "@/lib/section-icons";
  * `headings` (extracted from the same text by `extractHeadings`) gives each subheading an anchor id and an icon,
  * in document order: the page's table of contents points to these anchors.
  */
-export function Markdown({ children, headings = [] }: { children: string; headings?: Heading[] }) {
+export function Markdown({
+  children,
+  headings = [],
+  allowedHosts,
+}: {
+  children: string;
+  headings?: Heading[];
+  /** Generated content: a link is only rendered if its host is one of these (or a sub-domain); otherwise plain text. */
+  allowedHosts?: string[];
+}) {
   let n = 0;
   // Body headings start at h2: the page carries the h1.
   const Title = ({ children }: { children?: React.ReactNode }) => {
@@ -30,11 +53,16 @@ export function Markdown({ children, headings = [] }: { children: string; headin
         remarkPlugins={[remarkGfm]}
         skipHtml
         components={{
-          a: ({ href, children }) => (
-            <a href={href} target="_blank" rel="noopener noreferrer nofollow">
-              {children}
-            </a>
-          ),
+          a: ({ href, children }) =>
+            allowedHosts && !isAllowedLink(href, allowedHosts) ? (
+              <span>{children}</span>
+            ) : (
+              <a href={href} target="_blank" rel="noopener noreferrer nofollow">
+                {children}
+              </a>
+            ),
+          // Images embedded by the model would be tracking pixels or hotlinks: never rendered.
+          img: () => null,
           h1: Title,
           h2: Title,
         }}

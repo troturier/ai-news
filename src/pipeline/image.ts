@@ -52,7 +52,7 @@ export async function findImage(opts: { url: string; githubRepo?: string | null 
     const m = new URL(opts.url).pathname.match(/^\/([\w.-]+)\/([\w.-]+)/);
     if (m && new URL(opts.url).hostname.replace(/^www\./, "") === "github.com") repo = `${m[1]}/${m[2]}`;
   }
-  if (repo && /^[\w.-]+\/[\w.-]+$/.test(repo)) {
+  if (repo && /^[\w.-]+\/[\w.-]+$/.test(repo) && !repo.split("/").some((p) => /^\.+$/.test(p))) {
     return { url: `https://github.com/${repo.split("/")[0]}.png?size=400`, source: "github" };
   }
   try {

@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth-client";
 
 type T = {
   displayName: string; language: string; digest: string; save: string; saved: string; error: string;
-  export: string; dangerTitle: string; dangerText: string; typeEmail: string; deleteBtn: string; lastAdmin: string;
+  export: string; dangerTitle: string; dangerText: string; typeEmail: string; deleteBtn: string; lastAdmin: string; reauth: string;
 };
 
 const field = "w-full rounded-md border border-black/20 bg-transparent px-3 py-1.5 dark:border-white/25";
@@ -84,7 +84,11 @@ export function AccountSection({
                 router.push(`/${lang}`);
                 router.refresh();
               } catch (err) {
-                setDelMsg((err as Error).message.includes("last_admin") ? t.lastAdmin : t.error);
+                setDelMsg(
+                  (err as Error).message.includes("last_admin") ? t.lastAdmin
+                  : (err as Error).message.includes("reauth_required") ? t.reauth
+                  : t.error,
+                );
               }
             })
           }

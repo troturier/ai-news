@@ -15,6 +15,7 @@ import { ArticleCard } from "@/components/article-card";
 import { getArticle, relatedArticles } from "@/lib/articles";
 import { cardLabels } from "@/lib/card-labels";
 import { extractHeadings } from "@/lib/headings";
+import { hostOf } from "@/pipeline/url";
 import { SectionIcon } from "@/lib/section-icons";
 import { getSession } from "@/lib/session";
 import { getUserArticleState, listComments, listUserLists, reactionTotals } from "@/lib/user-data";
@@ -100,7 +101,7 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/article
         <MobileNav items={navItems} title={t.article.nav} label={t.article.navMobile} />
 
         <div id="article-body" className="scroll-mt-6">
-          <Markdown headings={headings}>{a.body}</Markdown>
+          <Markdown headings={headings} allowedHosts={a.sources.flatMap((s) => hostOf(s.url) ?? [])}>{a.body}</Markdown>
         </div>
 
         {session && state ? (

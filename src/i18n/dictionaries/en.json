@@ -165,6 +165,7 @@
     "typeEmail": "Type your email address to confirm",
     "deleteBtn": "Permanently delete my account",
     "lastAdmin": "You are the last administrator: this account cannot be deleted.",
+    "reauth": "For your security, sign out and sign in again, then retry within 10 minutes.",
     "digest": "Receive the weekly digest by email"
   },
   "search": {

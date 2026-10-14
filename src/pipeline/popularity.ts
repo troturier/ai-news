@@ -51,7 +51,7 @@ async function getJson(url: string, headers: Record<string, string> = {}) {
 }
 
 async function githubSignals(repo: string) {
-  if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
+  if (!/^[\w.-]+\/[\w.-]+$/.test(repo) || repo.split("/").some((p) => /^\.+$/.test(p))) return null;
   const headers: Record<string, string> = { Accept: "application/vnd.github+json" };
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   try {

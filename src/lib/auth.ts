@@ -64,6 +64,10 @@ export const auth = betterAuth({
       },
     },
   },
+  rateLimit: {
+    // Resending the verification e-mail is not covered by the captcha: cap it per IP (protects the sender reputation).
+    customRules: { "/send-verification-email": { window: 3600, max: 5 } },
+  },
   plugins: [
     captcha({
       provider: "cloudflare-turnstile",

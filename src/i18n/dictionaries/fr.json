@@ -165,6 +165,7 @@
     "typeEmail": "Saisissez votre adresse e-mail pour confirmer",
     "deleteBtn": "Supprimer définitivement mon compte",
     "lastAdmin": "Vous êtes le dernier administrateur : impossible de supprimer ce compte.",
+    "reauth": "Pour votre sécurité, reconnectez-vous (déconnexion puis connexion), puis réessayez dans les 10 minutes.",
     "digest": "Recevoir le digest hebdomadaire par e-mail"
   },
   "search": {

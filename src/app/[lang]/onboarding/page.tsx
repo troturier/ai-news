@@ -32,6 +32,7 @@ export default async function Onboarding({ params }: PageProps<"/[lang]/onboardi
         initial={[]}
         saveLabel={t.save}
         pickOneLabel={t.pickOne}
+        digest={{ label: t.digest, hint: t.digestHint }}
         redirectTo={`/${lang}`}
       />
     </section>

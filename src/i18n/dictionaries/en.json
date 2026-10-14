@@ -40,7 +40,9 @@
     "title": "Which topics interest you?",
     "subtitle": "Pick your themes. You can change them any time from your profile.",
     "save": "Save and continue",
-    "pickOne": "Pick at least one theme."
+    "pickOne": "Pick at least one theme.",
+    "digest": "Receive a weekly e-mail summary of new articles",
+    "digestHint": "You can unsubscribe in one click from any e-mail or from your profile."
   },
   "home": {
     "latest": "Latest news",

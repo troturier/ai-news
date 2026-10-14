@@ -40,7 +40,9 @@
     "title": "Quels sujets vous intéressent ?",
     "subtitle": "Choisissez vos thèmes. Vous pourrez les modifier à tout moment depuis votre profil.",
     "save": "Enregistrer et continuer",
-    "pickOne": "Choisissez au moins un thème."
+    "pickOne": "Choisissez au moins un thème.",
+    "digest": "Recevoir chaque semaine un résumé des nouveaux articles par e-mail",
+    "digestHint": "Vous pourrez vous désinscrire en un clic depuis chaque e-mail ou depuis votre profil."
   },
   "home": {
     "latest": "Dernières actualités",

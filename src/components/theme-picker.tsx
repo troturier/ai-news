@@ -19,6 +19,7 @@ export function ThemePicker({
   pickOneLabel,
   savedLabel,
   redirectTo,
+  digest,
 }: {
   themes: ThemeOption[];
   initial: string[];
@@ -26,11 +27,13 @@ export function ThemePicker({
   pickOneLabel: string;
   savedLabel?: string;
   redirectTo?: string;
+  digest?: { label: string; hint: string }; // onboarding only: opt-in/out of the weekly digest
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState(new Set(initial));
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [digestOn, setDigestOn] = useState(true);
   const [pending, start] = useTransition();
 
   const toggle = (id: string) =>
@@ -45,7 +48,7 @@ export function ThemePicker({
     setError(null);
     setSaved(false);
     start(async () => {
-      await saveThemes({ themeIds: [...selected] });
+      await saveThemes({ themeIds: [...selected], ...(digest ? { digestEnabled: digestOn } : {}) });
       if (redirectTo) router.push(redirectTo);
       else {
         setSaved(true);
@@ -83,6 +86,15 @@ export function ThemePicker({
           );
         })}
       </ul>
+      {digest && (
+        <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-lg border p-4">
+          <input type="checkbox" className="mt-1" checked={digestOn} onChange={(e) => setDigestOn(e.target.checked)} />
+          <span>
+            <span className="block font-medium">{digest.label}</span>
+            <span className="block text-sm opacity-70">{digest.hint}</span>
+          </span>
+        </label>
+      )}
       {error && (
         <p role="alert" className="mt-3 text-sm text-red-600">
           {error}

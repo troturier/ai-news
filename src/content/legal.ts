@@ -8,10 +8,10 @@ const contactEn = legal.contactEmail ? "by e-mail (address shown in the \"Publis
 const ICONS = ["building", "server", "copyright", "user-shield", "database", "scale", "share", "cookie", "clock", "shield-check"];
 
 /** « Legal notice and privacy » page content (Markdown; same section/icon convention as the about page). */
-export const legalPage: Record<Locale, { title: string; intro: string; body: string; icons: string[]; contact: { label: string; reveal: string } }> = {
+export const legalPage: Record<Locale, { title: string; intro: string; body: string; icons: string[]; contact: { label: string; reveal: string; error: string } }> = {
   fr: {
     icons: ICONS,
-    contact: { label: "Contact", reveal: "Afficher l'adresse e-mail" },
+    contact: { label: "Contact", reveal: "Afficher l'adresse e-mail", error: "Vérification impossible, réessayez." },
     title: "Mentions légales et confidentialité",
     intro: "Informations légales sur l'éditeur du site et sur le traitement de vos données personnelles (RGPD).",
     body: `
@@ -87,7 +87,7 @@ Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'ef
   },
   en: {
     icons: ICONS,
-    contact: { label: "Contact", reveal: "Show e-mail address" },
+    contact: { label: "Contact", reveal: "Show e-mail address", error: "Verification failed, please try again." },
     title: "Legal notice and privacy",
     intro: "Legal information about the site's publisher and about how your personal data is processed (GDPR).",
     body: `

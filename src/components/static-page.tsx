@@ -9,12 +9,14 @@ export function StaticPage({
   body,
   icons,
   contact,
+  lang,
 }: {
   title: string;
   intro: string;
   body: string;
   icons: string[];
-  contact?: { label: string; reveal: string }; // shown under the first section (click to reveal)
+  contact?: { label: string; reveal: string; error: string };
+  lang?: string; // shown under the first section (click to reveal)
 }) {
   const sections = body.split(/^## /m).map((s) => s.trim()).filter(Boolean);
   return (
@@ -34,7 +36,7 @@ export function StaticPage({
               {heading}
             </h2>
             <Markdown>{rest.join("\n")}</Markdown>
-            {i === 0 && contact && <div className="prose prose-neutral mt-2 max-w-none dark:prose-invert"><RevealEmail {...contact} /></div>}
+            {i === 0 && contact && <div className="prose prose-neutral mt-2 max-w-none dark:prose-invert"><RevealEmail {...contact} lang={lang ?? "en"} /></div>}
           </section>
         );
       })}

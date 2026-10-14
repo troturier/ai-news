@@ -15,5 +15,5 @@ export default async function LegalPage({ params }: PageProps<"/[lang]/legal">) 
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   const { contact, ...page } = legalPage[lang];
-  return <StaticPage {...page} contact={legal.contactEmail ? contact : undefined} />;
+  return <StaticPage {...page} lang={lang} contact={legal.contactEmail ? contact : undefined} />;
 }

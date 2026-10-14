@@ -1,0 +1,108 @@
+# Deployment behind Traefik (external network "web").
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Variables required in .env (see .env.example). Port 3000 is not published.
+# One-off tasks ("tools" profile), for example:
+#   docker compose -f docker-compose.prod.yml run --rm tools src/pipeline/cli.ts --max 2
+#   docker compose -f docker-compose.prod.yml run --rm tools src/pipeline/digest.ts --dry
+
+x-app-env: &app-env
+  DATABASE_URL: "postgres://ainews:${POSTGRES_PASSWORD}@db:5432/ainews"
+  BETTER_AUTH_URL: "https://${APP_DOMAIN:?APP_DOMAIN is required}"
+  SITE_URL: "https://${APP_DOMAIN}"
+  BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}"
+  ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}"
+  GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:?GOOGLE_CLIENT_ID is required}"
+  GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:?GOOGLE_CLIENT_SECRET is required}"
+  TURNSTILE_SECRET_KEY: "${TURNSTILE_SECRET_KEY:?TURNSTILE_SECRET_KEY is required}"
+  RESEND_API_KEY: "${RESEND_API_KEY:?RESEND_API_KEY is required}"
+  EMAIL_FROM: "${EMAIL_FROM:?EMAIL_FROM is required}"
+  GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
+  PIPELINE_DISCOVERY_MODEL: "${PIPELINE_DISCOVERY_MODEL:-claude-sonnet-5-5}"
+  PIPELINE_WRITE_MODEL: "${PIPELINE_WRITE_MODEL:-claude-haiku-5-5}"
+  PIPELINE_MIN_SCORE: "${PIPELINE_MIN_SCORE:-15}"
+  LEGAL_PUBLISHER_NAME: "${LEGAL_PUBLISHER_NAME:-}"
+  LEGAL_CONTACT_EMAIL: "${LEGAL_CONTACT_EMAIL:-}"
+  LEGAL_HOST: "${LEGAL_HOST:-}"
+  PIPELINE_MIN_STARS: "${PIPELINE_MIN_STARS:-1000}"
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ainews
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
+      POSTGRES_DB: ainews
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ainews"]
+      interval: 5s
+      retries: 10
+    networks:
+      - internal
+
+  migrate:
+    build:
+      context: .
+      target: migrate
+    environment:
+      DATABASE_URL: "postgres://ainews:${POSTGRES_PASSWORD}@db:5432/ainews"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - internal
+
+  app:
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: "${NEXT_PUBLIC_TURNSTILE_SITE_KEY:?NEXT_PUBLIC_TURNSTILE_SITE_KEY is required}"
+    image: ai-news:latest
+    container_name: ai-news
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.services.ai-news.loadbalancer.server.port=3000"
+      - "traefik.http.routers.ai-news.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.ai-news.entrypoints=websecure"
+      - "traefik.http.routers.ai-news.tls=true"
+      - "traefik.http.routers.ai-news.tls.certresolver=default"
+    networks:
+      - web
+      - internal
+
+  # Command-line tools, never started by "up" (dedicated profile).
+  tools:
+    profiles: ["tools"]
+    build:
+      context: .
+      target: tools
+    image: ai-news-tools:latest
+    environment:
+      <<: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - internal
+
+volumes:
+  dbdata:
+
+networks:
+  web:
+    external: true
+  internal:

@@ -1,0 +1,50 @@
+{
+  "name": "ai-news",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx --conditions=react-server src/db/seed.ts",
+    "make-admin": "tsx --conditions=react-server src/db/make-admin.ts",
+    "dev-user": "tsx --conditions=react-server src/db/dev-user.ts",
+    "pipeline": "tsx --conditions=react-server src/pipeline/cli.ts",
+    "pipeline:compare": "tsx --conditions=react-server src/pipeline/compare.ts",
+    "digest": "tsx --conditions=react-server src/pipeline/digest.ts",
+    "backfill-images": "tsx --conditions=react-server src/pipeline/backfill-images.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
+    "@marsidev/react-turnstile": "^1.6.2",
+    "@tabler/icons-react": "^3.49.0",
+    "@tailwindcss/typography": "^0.5.20",
+    "better-auth": "^1.7.7",
+    "drizzle-orm": "^0.45.4",
+    "next": "16.4.0",
+    "pg": "^8.23.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "resend": "^6.33.0",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  }
+}

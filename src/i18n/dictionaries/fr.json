@@ -1,0 +1,215 @@
+{
+  "site": {
+    "name": "AI News",
+    "tagline": "La veille IA, en français et en anglais"
+  },
+  "nav": {
+    "footerNav": "Informations",
+    "about": "À propos",
+    "legal": "Mentions légales et confidentialité",
+    "code": "Code source",
+    "rss": "Flux RSS",
+    "home": "Accueil",
+    "signIn": "Connexion",
+    "signUp": "Inscription",
+    "signOut": "Déconnexion",
+    "profile": "Profil",
+    "language": "Langue",
+    "theme": "Thème",
+    "lists": "Listes",
+    "listsLong": "Mes listes de lecture"
+  },
+  "auth": {
+    "signInTitle": "Connexion",
+    "signUpTitle": "Créer un compte",
+    "name": "Nom",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "passwordHint": "10 caractères minimum",
+    "submitSignIn": "Se connecter",
+    "submitSignUp": "Créer mon compte",
+    "google": "Continuer avec Google",
+    "or": "ou",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "captchaRequired": "Veuillez valider le captcha.",
+    "checkEmail": "Compte créé. Un e-mail de confirmation vient de vous être envoyé : cliquez sur le lien pour activer votre compte.",
+    "genericError": "Une erreur est survenue. Réessayez."
+  },
+  "onboarding": {
+    "title": "Quels sujets vous intéressent ?",
+    "subtitle": "Choisissez vos thèmes. Vous pourrez les modifier à tout moment depuis votre profil.",
+    "save": "Enregistrer et continuer",
+    "pickOne": "Choisissez au moins un thème."
+  },
+  "home": {
+    "latest": "Dernières actualités",
+    "empty": "Aucun article pour le moment.",
+    "allThemes": "Tous les thèmes",
+    "newer": "Plus récents",
+    "older": "Plus anciens",
+    "minRead": "min de lecture",
+    "myThemes": "Mes thèmes",
+    "hideRead": "Masquer les articles lus",
+    "showRead": "Afficher les articles lus",
+    "allRead": "Vous avez tout lu : aucun article non lu ici."
+  },
+  "article": {
+    "sources": "Sources",
+    "aiNotice": "Article rédigé et traduit avec l'aide d'une IA à partir des sources ci-dessous. Vérifiez les informations importantes auprès des sources originales.",
+    "back": "Retour aux articles",
+    "notFound": "Article introuvable",
+    "themeNotFound": "Thème introuvable",
+    "related": "À lire aussi",
+    "nav": "Dans cet article",
+    "navMobile": "Sommaire",
+    "parts": "Contenu",
+    "imageCredit": "Illustration :",
+    "exportMdButton": "Export Markdown"
+  },
+  "interact": {
+    "signInPrompt": "Connectez-vous pour marquer vos lectures, noter l'article, l'ajouter à une liste et commenter.",
+    "signIn": "Se connecter"
+  },
+  "actions": {
+    "read": "Lu",
+    "markUnread": "Marquer comme non lu",
+    "interesting": "Intéressant",
+    "notInteresting": "Pas intéressant",
+    "addToList": "Listes de lecture",
+    "noLists": "Aucune liste.",
+    "reportArticle": "Signaler",
+    "reportPrompt": "Pourquoi signalez-vous ce contenu ?",
+    "reported": "Merci, le signalement a été enregistré.",
+    "error": "Action impossible, réessayez."
+  },
+  "comments": {
+    "title": "Commentaires",
+    "empty": "Aucun commentaire pour le moment.",
+    "placeholder": "Votre commentaire (2000 caractères max.)",
+    "send": "Publier",
+    "delete": "Supprimer",
+    "report": "Signaler",
+    "rateLimited": "Trop de commentaires d'affilée, patientez une minute.",
+    "error": "Impossible de publier le commentaire.",
+    "signInToComment": "Connectez-vous pour commenter."
+  },
+  "readBadge": "Lu",
+  "profile": {
+    "title": "Mon profil",
+    "signedInAs": "Connecté en tant que",
+    "role": "Rôle",
+    "themes": "Mes thèmes",
+    "themesHelp": "Vous suivez ces thèmes. Modifiez la sélection à tout moment.",
+    "saveThemes": "Enregistrer mes thèmes",
+    "themesSaved": "Thèmes enregistrés.",
+    "lists": "Mes listes de lecture",
+    "newList": "Nouvelle liste",
+    "name": "Nom",
+    "color": "Couleur",
+    "icon": "Icône",
+    "searchIcon": "Rechercher une icône (ex. : star, brain, rocket)",
+    "iconResults": "icônes trouvées",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cette liste ? Les articles ne sont pas supprimés.",
+    "defaultList": "Par défaut",
+    "articles": "article(s)",
+    "open": "Ouvrir",
+    "error": "Action impossible, réessayez."
+  },
+  "listPage": {
+    "back": "Mes listes",
+    "sort": "Trier",
+    "sortAdded": "Ajout récent",
+    "sortOldest": "Ajout ancien",
+    "sortPublished": "Publication",
+    "remove": "Retirer de la liste",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "export": "Export Markdown",
+    "empty": "Cette liste est vide.",
+    "emptyHint": "Ajoutez des articles depuis leur carte ou leur page avec le bouton « Listes de lecture ».",
+    "browse": "Parcourir les articles",
+    "allReadHere": "Vous avez tout lu dans cette liste.",
+    "count": "article(s)",
+    "unreadCount": "non lu(s)",
+    "error": "Action impossible, réessayez."
+  },
+  "recovery": {
+    "forgotLink": "Mot de passe oublié ?",
+    "forgotTitle": "Mot de passe oublié",
+    "forgotHelp": "Saisissez votre adresse e-mail : si un compte existe, vous recevrez un lien de réinitialisation.",
+    "send": "Envoyer le lien",
+    "sent": "Si un compte existe pour cette adresse, un e-mail vient d'être envoyé.",
+    "resetTitle": "Nouveau mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "reset": "Réinitialiser",
+    "done": "Mot de passe modifié. Vous pouvez vous connecter.",
+    "invalidLink": "Ce lien est invalide ou a expiré."
+  },
+  "account": {
+    "title": "Mon compte",
+    "displayName": "Nom affiché",
+    "language": "Langue des e-mails",
+    "save": "Enregistrer",
+    "saved": "Enregistré.",
+    "error": "Action impossible, réessayez.",
+    "export": "Télécharger mes données (JSON)",
+    "dangerTitle": "Supprimer mon compte",
+    "dangerText": "Suppression définitive de votre compte, de vos abonnements, listes, lectures, réactions et commentaires. Cette action est irréversible.",
+    "typeEmail": "Saisissez votre adresse e-mail pour confirmer",
+    "deleteBtn": "Supprimer définitivement mon compte",
+    "lastAdmin": "Vous êtes le dernier administrateur : impossible de supprimer ce compte.",
+    "digest": "Recevoir le digest hebdomadaire par e-mail"
+  },
+  "search": {
+    "placeholder": "Rechercher…",
+    "title": "Recherche",
+    "resultsFor": "résultat(s) pour",
+    "none": "Aucun résultat.",
+    "tooShort": "Saisissez au moins 2 caractères.",
+    "label": "Rechercher un article"
+  },
+  "digest": {
+    "unsubTitle": "Digest e-mail",
+    "unsubText": "Vous ne recevrez plus le digest hebdomadaire. Vous pourrez le réactiver depuis votre profil.",
+    "unsubConfirm": "Me désinscrire du digest",
+    "unsubDone": "C'est fait : vous ne recevrez plus le digest.",
+    "invalidLink": "Ce lien de désinscription est invalide.",
+    "error": "Action impossible, réessayez."
+  },
+  "theme": {
+    "light": "Mode clair",
+    "dark": "Mode sombre"
+  },
+  "export": {
+    "md": "Exporter en Markdown (Obsidian)"
+  },
+  "card": {
+    "read": "Lu",
+    "unread": "Non lu",
+    "markRead": "Marquer comme lu",
+    "markUnread": "Marquer comme non lu",
+    "lists": "Listes de lecture",
+    "noLists": "Aucune liste.",
+    "manageLists": "Gérer mes listes"
+  },
+  "lists": {
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "title": "Mes listes de lecture",
+    "intro": "Gardez de côté les articles à lire ou à conserver, classés comme vous le voulez.",
+    "unread": "non lu(s)",
+    "allRead": "tout est lu",
+    "emptyList": "Vide",
+    "none": "Vous n'avez pas encore de liste.",
+    "newList": "Nouvelle liste"
+  },
+  "profileLists": {
+    "manage": "Gérer mes listes",
+    "text": "Créez, modifiez et consultez vos listes de lecture depuis leur page dédiée."
+  }
+}

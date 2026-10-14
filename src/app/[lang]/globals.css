@@ -1,0 +1,134 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/*
+ * Theme: follows the system preference, unless explicitly chosen (data-theme attribute set by
+ * the toggle button and by a small script before the first render).
+ */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  /* Soft accent (indigo): active option of the switches. */
+  --accent: #4f46e5;
+  --accent-mix: 16%; /* accent share in the active option's background */
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --accent: #818cf8;
+    --accent-mix: 24%;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --accent: #818cf8;
+  --accent-mix: 24%;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Smooth scrolling to anchors (article table of contents), unless the user prefers reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/*
+ * Buttons: cursor and hover.
+ * Tailwind 4 no longer sets `cursor: pointer` on buttons (default arrow): we restore it for everything
+ * clickable, and `not-allowed` for a disabled button.
+ */
+@layer base {
+  button:not(:disabled),
+  summary,
+  [role="button"],
+  select,
+  input:is([type="checkbox"], [type="radio"], [type="color"], [type="submit"]),
+  label:has(> input:is([type="checkbox"], [type="radio"])) {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+/*
+ * Shared hover effect: an animated veil in the element's text color (so light on a dark button, dark
+ * on a light button, the theme's tint on a colored pill), plus a stronger veil on
+ * press. Applies to all <button>; `.hover-tint` extends it to a link or <summary> that looks like a
+ * button; `.btn-plain` excludes it for buttons that look like text (underlined links).
+ */
+@layer components {
+  :is(button:not(.btn-plain), .hover-tint) {
+    transition: box-shadow 150ms ease;
+  }
+  :is(button:not(.btn-plain), .hover-tint):hover:not(:disabled) {
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, currentColor 10%, transparent);
+  }
+  :is(button:not(.btn-plain), .hover-tint):active:not(:disabled) {
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, currentColor 18%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :is(button:not(.btn-plain), .hover-tint) {
+      transition: none;
+    }
+  }
+}
+
+/*
+ * Active option of a switch (language, theme): background slightly tinted with the accent and text of the same tint,
+ * rather than a solid black or white fill (too much contrast). Colors mix with the page's background and text,
+ * so they follow light / dark mode.
+ */
+.segment-active,
+:root:not([data-theme]) [data-theme-option="light"],
+:root[data-theme="light"] [data-theme-option="light"],
+:root[data-theme="dark"] [data-theme-option="dark"] {
+  background: color-mix(in srgb, var(--accent) var(--accent-mix), var(--background));
+  color: color-mix(in srgb, var(--accent) 80%, var(--foreground));
+}
+
+/*
+ * Theme switch: the active option follows the `data-theme` attribute of <html> (or, failing that, the system
+ * preference), so from the first render, before React hydrates.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) [data-theme-option="light"] {
+    background: transparent;
+    color: inherit;
+  }
+  :root:not([data-theme]) [data-theme-option="dark"] {
+    background: color-mix(in srgb, var(--accent) var(--accent-mix), var(--background));
+    color: color-mix(in srgb, var(--accent) 80%, var(--foreground));
+  }
+}

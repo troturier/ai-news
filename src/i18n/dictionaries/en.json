@@ -1,0 +1,215 @@
+{
+  "site": {
+    "name": "AI News",
+    "tagline": "AI watch, in French and English"
+  },
+  "nav": {
+    "footerNav": "Information",
+    "about": "About",
+    "legal": "Legal notice and privacy",
+    "code": "Source code",
+    "rss": "RSS feed",
+    "home": "Home",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "profile": "Profile",
+    "language": "Language",
+    "theme": "Theme",
+    "lists": "Lists",
+    "listsLong": "My reading lists"
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signUpTitle": "Create an account",
+    "name": "Name",
+    "email": "Email address",
+    "password": "Password",
+    "passwordHint": "At least 10 characters",
+    "submitSignIn": "Sign in",
+    "submitSignUp": "Create my account",
+    "google": "Continue with Google",
+    "or": "or",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "captchaRequired": "Please complete the captcha.",
+    "checkEmail": "Account created. A confirmation email has been sent: click the link to activate your account.",
+    "genericError": "Something went wrong. Please try again."
+  },
+  "onboarding": {
+    "title": "Which topics interest you?",
+    "subtitle": "Pick your themes. You can change them any time from your profile.",
+    "save": "Save and continue",
+    "pickOne": "Pick at least one theme."
+  },
+  "home": {
+    "latest": "Latest news",
+    "empty": "No articles yet.",
+    "allThemes": "All themes",
+    "newer": "Newer",
+    "older": "Older",
+    "minRead": "min read",
+    "myThemes": "My themes",
+    "hideRead": "Hide read articles",
+    "showRead": "Show read articles",
+    "allRead": "You are all caught up: no unread articles here."
+  },
+  "article": {
+    "sources": "Sources",
+    "aiNotice": "Article written and translated with the help of AI from the sources below. Please check important information against the original sources.",
+    "back": "Back to articles",
+    "notFound": "Article not found",
+    "themeNotFound": "Theme not found",
+    "related": "Related articles",
+    "nav": "In this article",
+    "navMobile": "Table of contents",
+    "parts": "Contents",
+    "imageCredit": "Image:",
+    "exportMdButton": "Export Markdown"
+  },
+  "interact": {
+    "signInPrompt": "Sign in to track what you read, rate the article, save it to a list and comment.",
+    "signIn": "Sign in"
+  },
+  "actions": {
+    "read": "Read",
+    "markUnread": "Mark as unread",
+    "interesting": "Interesting",
+    "notInteresting": "Not interesting",
+    "addToList": "Reading lists",
+    "noLists": "No lists.",
+    "reportArticle": "Report",
+    "reportPrompt": "Why are you reporting this content?",
+    "reported": "Thanks, your report has been recorded.",
+    "error": "Could not do that, please try again."
+  },
+  "comments": {
+    "title": "Comments",
+    "empty": "No comments yet.",
+    "placeholder": "Your comment (2000 characters max.)",
+    "send": "Post",
+    "delete": "Delete",
+    "report": "Report",
+    "rateLimited": "Too many comments in a row, please wait a minute.",
+    "error": "Could not post the comment.",
+    "signInToComment": "Sign in to comment."
+  },
+  "readBadge": "Read",
+  "profile": {
+    "title": "My profile",
+    "signedInAs": "Signed in as",
+    "role": "Role",
+    "themes": "My themes",
+    "themesHelp": "You follow these themes. Change your selection any time.",
+    "saveThemes": "Save my themes",
+    "themesSaved": "Themes saved.",
+    "lists": "My reading lists",
+    "newList": "New list",
+    "name": "Name",
+    "color": "Color",
+    "icon": "Icon",
+    "searchIcon": "Search an icon (e.g. star, brain, rocket)",
+    "iconResults": "icons found",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Delete this list? The articles themselves are kept.",
+    "defaultList": "Default",
+    "articles": "article(s)",
+    "open": "Open",
+    "error": "Could not do that, please try again."
+  },
+  "listPage": {
+    "back": "My lists",
+    "sort": "Sort",
+    "sortAdded": "Recently added",
+    "sortOldest": "Oldest added",
+    "sortPublished": "Published",
+    "remove": "Remove from list",
+    "edit": "Edit",
+    "delete": "Delete",
+    "export": "Export Markdown",
+    "empty": "This list is empty.",
+    "emptyHint": "Add articles from their card or page with the « Reading lists » button.",
+    "browse": "Browse articles",
+    "allReadHere": "You have read everything in this list.",
+    "count": "article(s)",
+    "unreadCount": "unread",
+    "error": "Could not do that, please try again."
+  },
+  "recovery": {
+    "forgotLink": "Forgot your password?",
+    "forgotTitle": "Forgot your password",
+    "forgotHelp": "Enter your email address: if an account exists, you will receive a reset link.",
+    "send": "Send the link",
+    "sent": "If an account exists for this address, an email has just been sent.",
+    "resetTitle": "New password",
+    "newPassword": "New password",
+    "reset": "Reset",
+    "done": "Password changed. You can now sign in.",
+    "invalidLink": "This link is invalid or has expired."
+  },
+  "account": {
+    "title": "My account",
+    "displayName": "Display name",
+    "language": "Email language",
+    "save": "Save",
+    "saved": "Saved.",
+    "error": "Could not do that, please try again.",
+    "export": "Download my data (JSON)",
+    "dangerTitle": "Delete my account",
+    "dangerText": "Permanently deletes your account, subscriptions, lists, reads, reactions and comments. This cannot be undone.",
+    "typeEmail": "Type your email address to confirm",
+    "deleteBtn": "Permanently delete my account",
+    "lastAdmin": "You are the last administrator: this account cannot be deleted.",
+    "digest": "Receive the weekly digest by email"
+  },
+  "search": {
+    "placeholder": "Search…",
+    "title": "Search",
+    "resultsFor": "result(s) for",
+    "none": "No results.",
+    "tooShort": "Type at least 2 characters.",
+    "label": "Search articles"
+  },
+  "digest": {
+    "unsubTitle": "Email digest",
+    "unsubText": "You will no longer receive the weekly digest. You can turn it back on from your profile.",
+    "unsubConfirm": "Unsubscribe from the digest",
+    "unsubDone": "Done: you will no longer receive the digest.",
+    "invalidLink": "This unsubscribe link is invalid.",
+    "error": "Could not do that, please try again."
+  },
+  "theme": {
+    "light": "Light mode",
+    "dark": "Dark mode"
+  },
+  "export": {
+    "md": "Export as Markdown (Obsidian)"
+  },
+  "card": {
+    "read": "Read",
+    "unread": "Unread",
+    "markRead": "Mark as read",
+    "markUnread": "Mark as unread",
+    "lists": "Reading lists",
+    "noLists": "No lists.",
+    "manageLists": "Manage my lists"
+  },
+  "lists": {
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "title": "My reading lists",
+    "intro": "Set aside articles to read or keep, organised your way.",
+    "unread": "unread",
+    "allRead": "all read",
+    "emptyList": "Empty",
+    "none": "You do not have any list yet.",
+    "newList": "New list"
+  },
+  "profileLists": {
+    "manage": "Manage my lists",
+    "text": "Create, edit and browse your reading lists from their dedicated page."
+  }
+}

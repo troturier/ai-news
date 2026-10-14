@@ -50,7 +50,7 @@ La lecture du site sans compte ne nécessite aucune donnée personnelle de votre
 - fournir le service (création et gestion du compte, personnalisation, listes, commentaires) : **exécution du contrat** ;
 - sécuriser le service (captcha, limitation d'abus, modération, journaux) : **intérêt légitime** ;
 - envoyer les e-mails de service (vérification d'adresse, réinitialisation du mot de passe) : **exécution du contrat** ;
-- envoyer le résumé hebdomadaire : **intérêt légitime** ; vous choisissez de le recevoir ou non à votre première connexion (case cochée par défaut), et vous pouvez vous désinscrire en un clic depuis chaque e-mail ou depuis votre profil.
+- envoyer le résumé hebdomadaire : **consentement** ; la case est décochée par défaut, vous choisissez de le recevoir à votre première connexion ou depuis votre profil, et vous pouvez retirer votre consentement en un clic depuis chaque e-mail ou depuis votre profil.
 
 Aucune donnée n'est vendue, ni utilisée à des fins publicitaires ou de profilage commercial.
 
@@ -126,7 +126,7 @@ Reading the site without an account requires no personal data from you.
 - providing the service (account creation and management, personalisation, lists, comments): **performance of a contract**;
 - securing the service (captcha, abuse limits, moderation, logs): **legitimate interest**;
 - sending service e-mails (address verification, password reset): **performance of a contract**;
-- sending the weekly digest: **legitimate interest**; you choose whether to receive it at your first sign-in (box ticked by default), and you can unsubscribe in one click from every e-mail or from your profile.
+- sending the weekly digest: **consent**; the box is unticked by default, you choose to receive it at your first sign-in or from your profile, and you can withdraw your consent in one click from every e-mail or from your profile.
 
 No data is sold or used for advertising or commercial profiling.
 

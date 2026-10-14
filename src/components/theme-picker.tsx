@@ -33,7 +33,7 @@ export function ThemePicker({
   const [selected, setSelected] = useState(new Set(initial));
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
-  const [digestOn, setDigestOn] = useState(true);
+  const [digestOn, setDigestOn] = useState(false);
   const [pending, start] = useTransition();
 
   const toggle = (id: string) =>

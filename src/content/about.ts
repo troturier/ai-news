@@ -43,7 +43,7 @@ Les articles s'appuient sur des pages web publiques consultées au moment de la 
 - indiquer si un article est **intéressant** ou non, et le **commenter** ;
 - ranger les articles dans des **listes de lecture** personnalisées (nom, couleur, icône, ordre), dont « À lire plus tard » ;
 - exporter un article ou une liste en **Markdown** (par exemple pour Obsidian) ;
-- recevoir un **résumé hebdomadaire par e-mail** (activé par défaut, désinscription en un clic) ;
+- recevoir un **résumé hebdomadaire par e-mail** (sur option, désinscription en un clic) ;
 - exporter ou supprimer vos données depuis le profil.
 
 Sans compte, vous pouvez lire tous les articles, rechercher, suivre le **flux RSS** (\`/fr/feed.xml\`) et choisir le thème clair ou sombre.
@@ -90,7 +90,7 @@ Articles rely on public web pages read at writing time. The most heavily weighte
 - mark an article as **interesting** or not, and **comment** on it;
 - sort articles into custom **reading lists** (name, colour, icon, order), including "Read later";
 - export an article or a list as **Markdown** (for Obsidian, for example);
-- receive a **weekly e-mail digest** (on by default, one-click unsubscribe);
+- receive a **weekly e-mail digest** (opt-in, one-click unsubscribe);
 - export or delete your data from your profile.
 
 Without an account you can read every article, search, follow the **RSS feed** (\`/en/feed.xml\`) and choose the light or dark theme.

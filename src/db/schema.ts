@@ -30,8 +30,8 @@ export const user = pgTable("user", {
   role: text("role").notNull().default("reader"), // "reader" | "admin"
   locale: text("locale").notNull().default("fr"),
   onboardedAt: timestamp("onboarded_at"),
-  // Weekly e-mail digest: enabled by default, one-click unsubscribe.
-  digestEnabled: boolean("digest_enabled").notNull().default(true),
+  // Weekly e-mail digest: opt-in (off until the user ticks the box at onboarding or in the profile), one-click unsubscribe.
+  digestEnabled: boolean("digest_enabled").notNull().default(false),
   lastDigestAt: timestamp("last_digest_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

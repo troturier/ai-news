@@ -13,7 +13,7 @@ export async function buildFeed(opts: { lang: Locale; theme?: { slug: string; na
   const path = theme ? `/${lang}/themes/${theme.slug}/feed.xml` : `/${lang}/feed.xml`;
   const home = theme ? `${siteUrl}/${lang}/themes/${theme.slug}` : `${siteUrl}/${lang}`;
   const title = theme ? `AI News — ${theme.name}` : "AI News";
-  const description = lang === "fr" ? "La veille IA, en français et en anglais" : "AI watch, in French and English";
+  const description = lang === "fr" ? "Le journal de l'IA pour vous accompagner dans votre veille" : "The AI journal that keeps you up to date";
 
   const body = items
     .map((a) => {

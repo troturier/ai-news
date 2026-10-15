@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { IconBooks, IconDownload, IconLink, IconListDetails, IconMessages } from "@tabler/icons-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArticleMeta, formatDate, ThemeBadge } from "@/components/article-card";
+import { ArticleMeta, formatDate, ThemeBadgeLink } from "@/components/article-card";
 import { ArticleHero } from "@/components/article-hero";
 import { ArticleNav, MobileNav, type NavItem } from "@/components/article-nav";
 import { Markdown } from "@/components/markdown";
@@ -89,9 +89,7 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/article
         />
 
         <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm opacity-90">
-          <Link href={`/${lang}/themes/${a.theme.slug}`}>
-            <ThemeBadge theme={a.theme} />
-          </Link>
+          <ThemeBadgeLink theme={a.theme} lang={lang} />
           <ArticleMeta date={a.publishedAt} lang={lang} minutes={a.minutes} minRead={t.home.minRead} />
         </div>
         <h1 className="text-3xl font-bold leading-tight">{a.title}</h1>

@@ -31,6 +31,15 @@ export function ThemeBadge({ theme }: { theme: ArticleListItem["theme"] }) {
   );
 }
 
+/** Theme badge as a link to the list of articles of that theme (cards and article page). */
+export function ThemeBadgeLink({ theme, lang }: { theme: ArticleListItem["theme"]; lang: Locale }) {
+  return (
+    <Link href={`/${lang}/themes/${theme.slug}`} className="hover-tint inline-flex rounded-full">
+      <ThemeBadge theme={theme} />
+    </Link>
+  );
+}
+
 /** Date and reading time, with their icons. */
 export function ArticleMeta({ date, lang, minutes, minRead }: { date: Date; lang: Locale; minutes: number; minRead: string }) {
   return (
@@ -143,7 +152,7 @@ export function ArticleCard({
 
       <div className="flex min-w-0 flex-1 flex-col p-4">
         <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs opacity-90">
-          <ThemeBadge theme={article.theme} />
+          <ThemeBadgeLink theme={article.theme} lang={lang} />
           <ArticleMeta date={article.publishedAt} lang={lang} minutes={article.minutes} minRead={labels.minRead} />
           {article.stats && <ArticleStats stats={article.stats} labels={labels} />}
         </div>

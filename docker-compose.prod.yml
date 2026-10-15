@@ -27,14 +27,31 @@ x-app-env: &app-env
   LEGAL_HOST: "${LEGAL_HOST:-}"
   PIPELINE_MIN_STARS: "${PIPELINE_MIN_STARS:-1000}"
 
+# Container hardening shared by every service: no privilege escalation, all Linux capabilities dropped
+# (services that really need some add them back explicitly).
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
 services:
   db:
+    <<: *hardening
     image: postgres:17
     restart: unless-stopped
     environment:
       POSTGRES_USER: ainews
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
       POSTGRES_DB: ainews
+    # The official entrypoint chowns the data directory then drops to the postgres user: it needs these five.
+    cap_add: [CHOWN, SETUID, SETGID, FOWNER, DAC_OVERRIDE]
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run/postgresql
+    mem_limit: 1g
+    pids_limit: 200
     volumes:
       - dbdata:/var/lib/postgresql/data
     healthcheck:
@@ -45,6 +62,7 @@ services:
       - internal
 
   migrate:
+    <<: *hardening
     build:
       context: .
       target: migrate
@@ -58,6 +76,7 @@ services:
       - internal
 
   app:
+    <<: *hardening
     build:
       context: .
       target: runner
@@ -66,6 +85,14 @@ services:
     image: ai-news:latest
     container_name: ai-news
     restart: unless-stopped
+    # The standalone server writes nothing to its filesystem (checked with `docker diff`): read-only root.
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/.next/cache:uid=100,gid=101,mode=700,size=64m
+    mem_limit: 768m
+    pids_limit: 256
+    cpus: 2
     environment:
       <<: *app-env
     depends_on:
@@ -85,6 +112,7 @@ services:
 
   # Command-line tools, never started by "up" (dedicated profile).
   tools:
+    <<: *hardening
     profiles: ["tools"]
     build:
       context: .

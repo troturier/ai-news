@@ -19,10 +19,12 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Promise<Metadata> {
   const { lang } = await params;
+  // Same sentence as the home page subtitle; unknown language segments fall back to English.
+  const description = (await getDictionary(hasLocale(lang) ? lang : "en")).site.tagline;
   return {
     metadataBase: new URL(siteUrl),
     title: { default: "AI News", template: "%s · AI News" },
-    description: "AI watch / Veille IA",
+    description,
     alternates: { types: { "application/rss+xml": `/${lang}/feed.xml` } },
   };
 }

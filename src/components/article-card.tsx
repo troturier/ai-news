@@ -48,7 +48,8 @@ export function ArticleMeta({ date, lang, minutes, minRead }: { date: Date; lang
 }
 
 /**
- * Reader engagement: "interesting / not interesting" votes (hidden while nobody voted) and the number of comments.
+ * Reader engagement. A counter (icon + number) is only rendered when it has data: no "interesting" vote, no
+ * "not interesting" vote or no comment means no icon either. The slash only separates two visible vote counters.
  */
 export function ArticleStats({ stats, labels }: { stats: NonNullable<ArticleListItem["stats"]>; labels: CardLabels }) {
   const votes = stats.up + stats.down;
@@ -59,17 +60,27 @@ export function ArticleStats({ stats, labels }: { stats: NonNullable<ArticleList
           className="inline-flex items-center gap-1"
           title={`${labels.interesting} / ${labels.notInteresting} : ${stats.up} / ${stats.down} (${Math.round((stats.up / votes) * 100)} %)`}
         >
-          <IconThumbUp size={14} aria-hidden />
-          <span aria-label={`${labels.interesting} : ${stats.up}`}>{stats.up}</span>
-          <span aria-hidden>/</span>
-          <IconThumbDown size={14} aria-hidden />
-          <span aria-label={`${labels.notInteresting} : ${stats.down}`}>{stats.down}</span>
+          {stats.up > 0 && (
+            <>
+              <IconThumbUp size={14} aria-hidden />
+              <span aria-label={`${labels.interesting} : ${stats.up}`}>{stats.up}</span>
+            </>
+          )}
+          {stats.up > 0 && stats.down > 0 && <span aria-hidden>/</span>}
+          {stats.down > 0 && (
+            <>
+              <IconThumbDown size={14} aria-hidden />
+              <span aria-label={`${labels.notInteresting} : ${stats.down}`}>{stats.down}</span>
+            </>
+          )}
         </span>
       )}
-      <span className="inline-flex items-center gap-1" title={`${stats.comments} ${labels.comments}`}>
-        <IconMessage size={14} aria-hidden />
-        <span aria-label={`${stats.comments} ${labels.comments}`}>{stats.comments}</span>
-      </span>
+      {stats.comments > 0 && (
+        <span className="inline-flex items-center gap-1" title={`${stats.comments} ${labels.comments}`}>
+          <IconMessage size={14} aria-hidden />
+          <span aria-label={`${stats.comments} ${labels.comments}`}>{stats.comments}</span>
+        </span>
+      )}
     </>
   );
 }

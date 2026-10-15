@@ -192,6 +192,9 @@
     "md": "Export as Markdown (Obsidian)"
   },
   "card": {
+    "interesting": "Interesting",
+    "notInteresting": "Not interesting",
+    "comments": "comment(s)",
     "read": "Read",
     "unread": "Unread",
     "markRead": "Mark as read",

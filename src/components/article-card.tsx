@@ -1,4 +1,4 @@
-import { IconCalendar, IconClock } from "@tabler/icons-react";
+import { IconCalendar, IconClock, IconMessage, IconThumbDown, IconThumbUp } from "@tabler/icons-react";
 import Link from "next/link";
 import { ArticleThumb } from "@/components/article-thumb";
 import { ThemeIcon } from "@/components/icon";
@@ -47,7 +47,37 @@ export function ArticleMeta({ date, lang, minutes, minRead }: { date: Date; lang
   );
 }
 
+/**
+ * Reader engagement: "interesting / not interesting" votes (hidden while nobody voted) and the number of comments.
+ */
+export function ArticleStats({ stats, labels }: { stats: NonNullable<ArticleListItem["stats"]>; labels: CardLabels }) {
+  const votes = stats.up + stats.down;
+  return (
+    <>
+      {votes > 0 && (
+        <span
+          className="inline-flex items-center gap-1"
+          title={`${labels.interesting} / ${labels.notInteresting} : ${stats.up} / ${stats.down} (${Math.round((stats.up / votes) * 100)} %)`}
+        >
+          <IconThumbUp size={14} aria-hidden />
+          <span aria-label={`${labels.interesting} : ${stats.up}`}>{stats.up}</span>
+          <span aria-hidden>/</span>
+          <IconThumbDown size={14} aria-hidden />
+          <span aria-label={`${labels.notInteresting} : ${stats.down}`}>{stats.down}</span>
+        </span>
+      )}
+      <span className="inline-flex items-center gap-1" title={`${stats.comments} ${labels.comments}`}>
+        <IconMessage size={14} aria-hidden />
+        <span aria-label={`${stats.comments} ${labels.comments}`}>{stats.comments}</span>
+      </span>
+    </>
+  );
+}
+
 export type CardLabels = {
+  interesting: string;
+  notInteresting: string;
+  comments: string;
   minRead: string;
   read: string;
   unread: string;
@@ -104,6 +134,7 @@ export function ArticleCard({
         <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs opacity-90">
           <ThemeBadge theme={article.theme} />
           <ArticleMeta date={article.publishedAt} lang={lang} minutes={article.minutes} minRead={labels.minRead} />
+          {article.stats && <ArticleStats stats={article.stats} labels={labels} />}
         </div>
         <h2 className="text-lg font-semibold leading-snug">
           <Link href={href} className="hover:underline">

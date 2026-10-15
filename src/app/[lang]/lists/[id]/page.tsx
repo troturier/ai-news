@@ -11,7 +11,7 @@ import { ListToolbar } from "@/components/list-toolbar";
 import { RemoveFromList } from "@/components/remove-from-list";
 import { hasLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { PAGE_SIZE } from "@/lib/articles";
+import { PAGE_SIZE, articleStats } from "@/lib/articles";
 import { cardLabels } from "@/lib/card-labels";
 import { loadCardUser } from "@/lib/card-user";
 import { getSession } from "@/lib/session";
@@ -40,7 +40,10 @@ export default async function ListPage({ params, searchParams }: PageProps<"/[la
     listItemsPage({ listId: list.id, lang, page, sort, excludeReadBy: hideRead ? session.user.id : undefined }),
     listUserLists(session.user.id, lang).then((all) => all.find((l) => l.id === id)),
   ]);
-  const cardUser = await loadCardUser(session.user.id, items.map((i) => i.id), lang);
+  const [cardUser, stats] = await Promise.all([
+    loadCardUser(session.user.id, items.map((i) => i.id), lang),
+    articleStats(items.map((i) => i.id)),
+  ]);
   const L = t.listPage;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const href = (over: Record<string, string | number>) => {
@@ -125,6 +128,7 @@ export default async function ListPage({ params, searchParams }: PageProps<"/[la
                   id: i.id, slug: i.slug, imageUrl: i.imageUrl, title: i.title, summary: i.summary, publishedAt: i.publishedAt,
                   minutes: Math.max(1, Math.round(i.chars.length / 1300)),
                   theme: { slug: i.themeSlug, name: i.themeNames[lang], color: i.color, icon: i.icon },
+                  stats: stats.get(i.id),
                 }}
               />
               <div className="mt-1.5 flex justify-end">

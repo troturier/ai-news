@@ -1,7 +1,7 @@
 import "server-only";
 import { and, count, desc, eq, inArray, notExists, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { articleReads, articleTranslations, articles, themes, type ArticleSource } from "@/db/schema";
+import { articleReactions, articleReads, articleTranslations, articles, comments, themes, type ArticleSource } from "@/db/schema";
 import type { Locale } from "@/i18n/config";
 
 export const PAGE_SIZE = 12;
@@ -22,6 +22,34 @@ const unreadBy = (userId?: string) =>
 // ~220 words/minute, ~6 characters per word.
 const readingMinutes = (chars: number) => Math.max(1, Math.round(chars / 1300));
 
+/** What readers did with an article: "interesting" / "not interesting" votes and visible comments. */
+export type ArticleStats = { up: number; down: number; comments: number };
+
+/** Votes and comment counts of a page of articles (two grouped queries, whatever the page size). */
+export async function articleStats(ids: string[]): Promise<Map<string, ArticleStats>> {
+  const out = new Map<string, ArticleStats>(ids.map((id) => [id, { up: 0, down: 0, comments: 0 }]));
+  if (!ids.length) return out;
+  const [votes, discussed] = await Promise.all([
+    db
+      .select({
+        articleId: articleReactions.articleId,
+        up: sql<number>`count(*) filter (where ${articleReactions.value} = 1)`.mapWith(Number),
+        down: sql<number>`count(*) filter (where ${articleReactions.value} = -1)`.mapWith(Number),
+      })
+      .from(articleReactions)
+      .where(inArray(articleReactions.articleId, ids))
+      .groupBy(articleReactions.articleId),
+    db
+      .select({ articleId: comments.articleId, n: count() })
+      .from(comments)
+      .where(and(inArray(comments.articleId, ids), eq(comments.status, "visible")))
+      .groupBy(comments.articleId),
+  ]);
+  for (const v of votes) Object.assign(out.get(v.articleId)!, { up: v.up, down: v.down });
+  for (const c of discussed) out.get(c.articleId)!.comments = c.n;
+  return out;
+}
+
 export type ArticleListItem = {
   id: string;
   slug: string;
@@ -31,6 +59,7 @@ export type ArticleListItem = {
   publishedAt: Date;
   minutes: number;
   theme: { slug: string; name: string; color: string; icon: string };
+  stats?: ArticleStats; // present on list pages (cards)
 };
 
 export async function listArticles(opts: {
@@ -81,6 +110,7 @@ export async function listArticles(opts: {
       .where(where),
   ]);
 
+  const stats = await articleStats(rows.map((r) => r.id));
   return {
     total,
     items: rows.map((r) => ({
@@ -92,6 +122,7 @@ export async function listArticles(opts: {
       publishedAt: r.publishedAt,
       minutes: readingMinutes(r.chars.length),
       theme: { slug: r.themeSlug, name: r.themeNames[opts.lang], color: r.color, icon: r.icon },
+      stats: stats.get(r.id),
     })),
   };
 }
@@ -195,6 +226,7 @@ export async function searchArticles(opts: {
       .where(where),
   ]);
 
+  const stats = await articleStats(rows.map((r) => r.id));
   return {
     total,
     items: rows.map((r) => ({
@@ -206,6 +238,7 @@ export async function searchArticles(opts: {
       publishedAt: r.publishedAt,
       minutes: readingMinutes(r.chars.length),
       theme: { slug: r.themeSlug, name: r.themeNames[opts.lang], color: r.color, icon: r.icon },
+      stats: stats.get(r.id),
     })),
   };
 }
@@ -253,6 +286,7 @@ export async function relatedArticles(opts: {
     .orderBy(desc(score), desc(articles.publishedAt))
     .limit(opts.limit ?? 3);
 
+  const stats = await articleStats(rows.map((r) => r.id));
   return rows.map((r) => ({
     id: r.id,
     slug: r.slug,
@@ -262,5 +296,6 @@ export async function relatedArticles(opts: {
     publishedAt: r.publishedAt,
     minutes: readingMinutes(r.chars.length),
     theme: { slug: r.themeSlug, name: r.themeNames[opts.lang], color: r.color, icon: r.icon },
+    stats: stats.get(r.id),
   }));
 }

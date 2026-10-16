@@ -1,7 +1,7 @@
 import { and, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { db } from "../db";
 import { pipelineRuns, pipelineSettings, themes } from "../db/schema";
-import { basisFromRuns, nextDueAt } from "../lib/pipeline-schedule";
+import { basisFromRuns, nextDueAt, runSearchUsd } from "../lib/pipeline-schedule";
 import { runPipeline } from "./run";
 
 /** A "running" run whose heartbeat is older than this is dead (crash, restart of the container). */
@@ -77,8 +77,12 @@ export async function costBasis() {
     db.select({ n: sql<number>`count(*)::int` }).from(themes).where(eq(themes.active, true)),
   ]);
   const runs = rows.flatMap((r) => {
-    const s = (r.stats ?? {}) as { themes?: number; published?: number; usage?: { webSearches?: number } };
-    return s.themes ? [{ themes: s.themes, published: s.published ?? 0, tokenUsd: Number(r.costUsd ?? 0), webSearches: s.usage?.webSearches ?? 0 }] : [];
+    const s = (r.stats ?? {}) as {
+      themes?: number; published?: number; usage?: { webSearches?: number; webSearchCostUsd?: number };
+    };
+    return s.themes
+      ? [{ themes: s.themes, published: s.published ?? 0, tokenUsd: Number(r.costUsd ?? 0), searchUsd: runSearchUsd(s.usage) }]
+      : [];
   });
   return basisFromRuns(runs, active[0].n);
 }

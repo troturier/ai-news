@@ -12,7 +12,7 @@ export const FREQUENCIES: { days: number; label: string }[] = [
 
 export const TIME_ZONE = "Europe/Paris";
 
-/** Anthropic web search: 10 $ per 1 000 searches (assumed from the public price list; to be checked in the console). */
+/** Anthropic web search: 10 $ per 1 000 searches (platform.claude.com pricing, checked 2026-10-16); web fetch is free. */
 export const WEB_SEARCH_USD = 0.01;
 /** Writing one article with the default model (Haiku 5.5), see the comment in `pipeline/llm.ts`. */
 export const WRITE_USD_PER_ARTICLE = 0.01;
@@ -43,16 +43,21 @@ export function monthlyCostUsd(basis: CostBasis, intervalDays: number, maxPerThe
   return runsPerMonth(intervalDays) * costPerRunUsd(basis, maxPerTheme);
 }
 
+/** Search cost of a run: the recorded one when present, otherwise derived from the search count (older runs). */
+export function runSearchUsd(usage: { webSearches?: number; webSearchCostUsd?: number } | undefined) {
+  return usage?.webSearchCostUsd ?? (usage?.webSearches ?? 0) * WEB_SEARCH_USD;
+}
+
 /** Cost basis from past runs: (tokens + searches − writing) / themes processed. */
 export function basisFromRuns(
-  runs: { themes: number; published: number; tokenUsd: number; webSearches: number }[],
+  runs: { themes: number; published: number; tokenUsd: number; searchUsd: number }[],
   activeThemes: number,
 ): CostBasis {
   const themes = runs.reduce((n, r) => n + r.themes, 0);
   if (!themes) {
     return { discoveryUsdPerTheme: DEFAULT_DISCOVERY_USD_PER_THEME, activeThemes, source: "default", sampledRuns: 0 };
   }
-  const total = runs.reduce((n, r) => n + r.tokenUsd + r.webSearches * WEB_SEARCH_USD, 0);
+  const total = runs.reduce((n, r) => n + r.tokenUsd + r.searchUsd, 0);
   const writing = runs.reduce((n, r) => n + r.published * WRITE_USD_PER_ARTICLE, 0);
   return {
     discoveryUsdPerTheme: Math.max(0, (total - writing) / themes),

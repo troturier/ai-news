@@ -4,6 +4,7 @@ import { articles, comments, pipelineRuns, reports, user } from "@/db/schema";
 import { PipelineLive } from "@/components/pipeline-live";
 import { PipelineScheduleForm } from "@/components/pipeline-schedule-form";
 import { requireAdmin } from "@/lib/admin";
+import { WEB_SEARCH_USD, runSearchUsd } from "@/lib/pipeline-schedule";
 import { costBasis, getSettings } from "@/pipeline/launcher";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,7 @@ const thirtyDaysAgo = () => new Date(Date.now() - 30 * 86_400_000);
 
 type RunStats = {
   discovered?: number; published?: number; duplicates?: number; rejectedPopularity?: number;
-  errors?: string[]; usage?: { webSearches?: number };
+  errors?: string[]; usage?: { webSearches?: number; webSearchCostUsd?: number };
 };
 
 export default async function AdminHome() {
@@ -28,7 +29,12 @@ export default async function AdminHome() {
     db.select({ n: count() }).from(articles).where(eq(articles.status, "hidden")),
     db.select({ n: count() }).from(comments).where(eq(comments.status, "visible")),
     db.select({ n: count() }).from(reports).where(isNull(reports.resolvedAt)),
-    db.select({ total: sql<string>`coalesce(sum(${pipelineRuns.costUsd}), 0)`, searches: sql<string>`coalesce(sum((${pipelineRuns.stats}->'usage'->>'webSearches')::int), 0)` })
+    db.select({
+      tokens: sql<string>`coalesce(sum(${pipelineRuns.costUsd}), 0)`,
+      searches: sql<string>`coalesce(sum((${pipelineRuns.stats}->'usage'->>'webSearches')::int), 0)`,
+      // Recorded search cost when present, otherwise derived from the count (runs before it was recorded).
+      searchUsd: sql<string>`coalesce(sum(coalesce((${pipelineRuns.stats}->'usage'->>'webSearchCostUsd')::numeric, (${pipelineRuns.stats}->'usage'->>'webSearches')::numeric * ${WEB_SEARCH_USD})), 0)`,
+    })
       .from(pipelineRuns).where(gte(pipelineRuns.startedAt, since)),
     db.select().from(pipelineRuns).orderBy(desc(pipelineRuns.startedAt)).limit(12),
     getSettings(),
@@ -72,18 +78,19 @@ export default async function AdminHome() {
       <section>
         <h2 className="mb-1 text-lg font-semibold">Historique des exécutions</h2>
         <p className="mb-3 text-sm opacity-70">
-          30 derniers jours : {Number(cost.total).toFixed(2)} $ de tokens, {cost.searches} recherches web.
-          Les recherches web sont facturées à part et ne sont pas incluses dans ce coût (voir la console Anthropic).
+          30 derniers jours : {(Number(cost.tokens) + Number(cost.searchUsd)).toFixed(2)} $ au total, dont{" "}
+          {Number(cost.tokens).toFixed(2)} $ de tokens et {Number(cost.searchUsd).toFixed(2)} $ de recherches web ({cost.searches}).
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-black/10 text-xs uppercase opacity-70 dark:border-white/15">
-              <tr><th className="py-2 pr-3">Début</th><th className="pr-3">Statut</th><th className="pr-3">Origine</th><th className="pr-3">Découverts</th><th className="pr-3">Publiés</th><th className="pr-3">Écartés</th><th className="pr-3">Erreurs</th><th>Coût tokens</th></tr>
+              <tr><th className="py-2 pr-3">Début</th><th className="pr-3">Statut</th><th className="pr-3">Origine</th><th className="pr-3">Découverts</th><th className="pr-3">Publiés</th><th className="pr-3">Écartés</th><th className="pr-3">Erreurs</th><th>Coût total</th></tr>
             </thead>
             <tbody>
               {runs.length === 0 && <tr><td colSpan={8} className="py-3 opacity-70">Aucune exécution.</td></tr>}
               {runs.map((r) => {
                 const s = (r.stats ?? {}) as RunStats;
+                const searchUsd = runSearchUsd(s.usage);
                 return (
                   <tr key={r.id} className="border-b border-black/5 dark:border-white/10">
                     <td className="py-2 pr-3">{fmtDate(r.startedAt)}</td>
@@ -93,7 +100,9 @@ export default async function AdminHome() {
                     <td className="pr-3">{s.published ?? "–"}</td>
                     <td className="pr-3">{(s.duplicates ?? 0) + (s.rejectedPopularity ?? 0)}</td>
                     <td className="pr-3" title={s.errors?.join("\n")}>{s.errors?.length ?? 0}</td>
-                    <td>{r.costUsd ? `${Number(r.costUsd).toFixed(3)} $` : "–"}</td>
+                    <td title={r.costUsd ? `Tokens ${Number(r.costUsd).toFixed(3)} $ + recherches web ${searchUsd.toFixed(3)} $ (${s.usage?.webSearches ?? 0})` : undefined}>
+                      {r.costUsd ? `${(Number(r.costUsd) + searchUsd).toFixed(3)} $` : "–"}
+                    </td>
                   </tr>
                 );
               })}

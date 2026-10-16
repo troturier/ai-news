@@ -40,6 +40,8 @@ export async function discover(opts: {
   max: number;
   model?: string;
   tracker: UsageTracker;
+  /** Usage label, e.g. `discovery:<themeSlug>`. */
+  label?: string;
 }): Promise<Candidate[]> {
   const known = opts.alreadyPublished.length
     ? `\nDéjà publiés récemment (ne pas reproposer ces sujets) :\n${opts.alreadyPublished.map((t) => `- ${t}`).join("\n")}`
@@ -52,6 +54,7 @@ Cherche les actualités publiées au cours des 7 derniers jours, en privilégian
     tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 15 }],
     model: opts.model ?? MODELS.discovery,
     tracker: opts.tracker,
+    label: opts.label ?? "discovery",
   });
   if (process.env.PIPELINE_DEBUG) console.error(`[notes] ${out.notes}`);
   return out.candidates.slice(0, opts.max);

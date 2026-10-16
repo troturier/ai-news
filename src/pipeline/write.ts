@@ -32,6 +32,8 @@ export function writeArticle(opts: {
   themeName: string;
   model?: string;
   tracker: UsageTracker;
+  /** Usage label, e.g. `write:<themeSlug>`. */
+  label?: string;
 }): Promise<GeneratedArticle> {
   const c = opts.candidate;
   return structured(ArticleSchema, {
@@ -45,5 +47,6 @@ Autres sources : ${c.corroboratingUrls.join(", ") || "aucune"}`,
     effort: "medium",
     model: opts.model ?? MODELS.write,
     tracker: opts.tracker,
+    label: opts.label ?? "write",
   });
 }

@@ -108,6 +108,7 @@ export async function runPipeline(opts: RunOptions) {
           alreadyPublished: recent.slice(0, 40).map((r) => r.title),
           max: opts.maxPerTheme + 2, // margin: some will be discarded
           tracker,
+          label: `discovery:${theme.slug}`,
         });
       } catch (e) {
         stats.errors.push(`${theme.slug} (discovery): ${(e as Error).message}`);
@@ -160,10 +161,16 @@ export async function runPipeline(opts: RunOptions) {
       accepted.sort((a, b) => b.score - a.score);
       if (opts.dryRun) continue;
 
-      for (const { c, url, score, signals } of accepted.slice(0, opts.maxPerTheme)) {
+      // Best score first, until maxPerTheme articles are published: a candidate the writer skips
+      // (inaccessible source) or fails on is replaced by the next accepted one.
+      let publishedForTheme = 0;
+      for (const [k, { c, url, score, signals }] of accepted.entries()) {
+        if (publishedForTheme >= opts.maxPerTheme) break;
+        const replacing = k >= opts.maxPerTheme;
         try {
           await report(`Rédaction : ${c.title}`, themeProgress);
-          const art = await writeArticle({ candidate: c, themeName: theme.names.en, tracker });
+          if (replacing) await progress?.log(`Candidat suivant en remplacement : ${c.title}`);
+          const art = await writeArticle({ candidate: c, themeName: theme.names.en, tracker, label: `write:${theme.slug}` });
           if (art.verdict === "skip") {
             stats.skippedByWriter++;
             stats.details.push({ theme: theme.slug, title: c.title, outcome: "skipped by the writer", reason: art.skipReason });
@@ -202,6 +209,7 @@ export async function runPipeline(opts: RunOptions) {
           });
           if (inserted) {
             stats.published++;
+            publishedForTheme++;
             recent.unshift({ themeId: theme.id, canonicalUrl: url, title: art.en.title }); // most recent first
             await progress?.log(`Publié : ${art.fr.title}`);
           }

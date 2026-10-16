@@ -43,6 +43,11 @@ The pipeline: discovery (web search) → deduplication → **deterministic** pop
 Hacker News, source scale) → EN + FR writing. Defaults: Sonnet for discovery, Haiku for writing
 (overridable, see `.env.example`).
 
+Scheduling: the pipeline runs inside the app process (`src/instrumentation.ts` starts a one-minute scheduler).
+The admin dashboard sets the frequency, start hour, articles per theme and monthly budget (with a monthly cost
+estimate), starts a run on demand and shows its progress live. The scheduler is only active in production
+(`PIPELINE_SCHEDULER=on|off` overrides), so `next dev` never spends API credits on its own.
+
 ## Deployment (VPS, Docker Compose behind Traefik)
 
 ```bash
@@ -53,4 +58,4 @@ docker compose -f docker-compose.prod.yml run --rm tools src/db/seed.ts
 ```
 
 Update: `git pull && docker compose -f docker-compose.prod.yml up -d --build`.
-Weekly task (cron): `scripts/weekly.sh` (database backup, pipeline, digest).
+Weekly task (cron): `scripts/weekly.sh` (database backup, digest). Article generation is scheduled from the admin page.

@@ -26,6 +26,7 @@ x-app-env: &app-env
   LEGAL_CONTACT_EMAIL: "${LEGAL_CONTACT_EMAIL:-}"
   LEGAL_HOST: "${LEGAL_HOST:-}"
   PIPELINE_MIN_STARS: "${PIPELINE_MIN_STARS:-1000}"
+  PIPELINE_SCHEDULER: "${PIPELINE_SCHEDULER:-}"
 
 # Container hardening shared by every service: no privilege escalation, all Linux capabilities dropped
 # (services that really need some add them back explicitly).

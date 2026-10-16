@@ -43,6 +43,13 @@
       "when": 1792180000000,
       "tag": "0005_digest_opt_in",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792270000000,
+      "tag": "0006_pipeline_schedule",
+      "breakpoints": true
     }
   ]
 }

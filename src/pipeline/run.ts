@@ -7,6 +7,7 @@ import {
   pipelineRuns,
   themes,
 } from "../db/schema";
+import { ProgressReporter } from "./progress";
 import { discover } from "./discover";
 import { MODELS, UsageTracker } from "./llm";
 import { findImage } from "./image";
@@ -18,6 +19,9 @@ export type RunOptions = {
   themeSlugs?: string[];
   maxPerTheme: number;
   dryRun: boolean;
+  /** Row already created by the launcher (admin button or scheduler); otherwise one is inserted here. */
+  runId?: string;
+  trigger?: "manual" | "scheduled" | "cli";
 };
 
 const SIMILAR_TITLE = 0.6;
@@ -52,7 +56,28 @@ export async function runPipeline(opts: RunOptions) {
 
   const [run] = opts.dryRun
     ? [{ id: null as string | null }]
-    : await db.insert(pipelineRuns).values({}).returning({ id: pipelineRuns.id });
+    : opts.runId
+      ? [{ id: opts.runId as string | null }]
+      : await db
+          .insert(pipelineRuns)
+          .values({ trigger: opts.trigger ?? "cli" })
+          .returning({ id: pipelineRuns.id });
+  const progress = run.id ? new ProgressReporter(run.id) : null;
+  // Long model calls write no progress: a timer keeps the heartbeat alive (a dead process stops it).
+  const heartbeat = run.id
+    ? setInterval(() => {
+        db.update(pipelineRuns).set({ heartbeatAt: new Date() }).where(eq(pipelineRuns.id, run.id!)).catch(() => {});
+      }, 30_000)
+    : null;
+  const counters = () => ({
+    discovered: stats.discovered,
+    duplicates: stats.duplicates,
+    rejected: stats.rejectedPopularity + stats.skippedByWriter,
+    published: stats.published,
+    errors: stats.errors.length,
+  });
+  const report = (phase: string, extra: { theme?: string | null; themeIndex?: number; themeTotal?: number } = {}) =>
+    progress?.update({ phase, ...extra, counters: counters(), costUsd: Number(tracker.tokenCostUsd.toFixed(4)), webSearches: tracker.webSearches });
 
   try {
     const allThemes = await db.select().from(themes).where(eq(themes.active, true));
@@ -68,8 +93,11 @@ export async function runPipeline(opts: RunOptions) {
       .where(and(gte(articles.publishedAt, since), eq(articleTranslations.locale, "en")))
       .orderBy(desc(articles.publishedAt));
 
-    for (const theme of selected) {
+    await progress?.log(`${selected.length} thème(s) à traiter`);
+    for (const [i, theme] of selected.entries()) {
       stats.themes++;
+      const themeProgress = { theme: theme.names.fr, themeIndex: i + 1, themeTotal: selected.length };
+      await report("Recherche d'articles (web)", themeProgress);
       let candidates: Candidate[] = [];
       try {
         candidates = await discover({
@@ -83,9 +111,13 @@ export async function runPipeline(opts: RunOptions) {
         });
       } catch (e) {
         stats.errors.push(`${theme.slug} (discovery): ${(e as Error).message}`);
+        await progress?.log(`${theme.names.fr} : échec de la recherche (${(e as Error).message})`, "error");
+        await report("Recherche échouée", themeProgress);
         continue;
       }
       stats.discovered += candidates.length;
+      await progress?.log(`${theme.names.fr} : ${candidates.length} candidat(s) trouvé(s)`);
+      await report("Déduplication et filtre de popularité", themeProgress);
 
       // Deduplication then popularity, before any writing (saves tokens).
       const accepted: { c: Candidate; url: string; score: number; signals: Log }[] = [];
@@ -104,6 +136,7 @@ export async function runPipeline(opts: RunOptions) {
         if (dup || (await db.select({ id: articles.id }).from(articles).where(eq(articles.canonicalUrl, url)).limit(1)).length) {
           stats.duplicates++;
           stats.details.push({ theme: theme.slug, title: c.title, outcome: "duplicate" });
+          await progress?.log(`Doublon écarté : ${c.title}`);
           continue;
         }
         const verdict = await assessPopularity(c);
@@ -117,8 +150,10 @@ export async function runPipeline(opts: RunOptions) {
         });
         if (!verdict.accepted) {
           stats.rejectedPopularity++;
+          await progress?.log(`Écarté (popularité ${verdict.score}) : ${c.title}`);
           continue;
         }
+        await progress?.log(`Retenu (popularité ${verdict.score}) : ${c.title}`);
         accepted.push({ c, url, score: verdict.score, signals: verdict.signals });
       }
 
@@ -127,10 +162,12 @@ export async function runPipeline(opts: RunOptions) {
 
       for (const { c, url, score, signals } of accepted.slice(0, opts.maxPerTheme)) {
         try {
+          await report(`Rédaction : ${c.title}`, themeProgress);
           const art = await writeArticle({ candidate: c, themeName: theme.names.en, tracker });
           if (art.verdict === "skip") {
             stats.skippedByWriter++;
             stats.details.push({ theme: theme.slug, title: c.title, outcome: "skipped by the writer", reason: art.skipReason });
+            await progress?.log(`Écarté par le rédacteur : ${c.title}`);
             continue;
           }
           const image = await findImage({ url: c.url, githubRepo: c.githubRepo }).catch(() => null);
@@ -166,12 +203,17 @@ export async function runPipeline(opts: RunOptions) {
           if (inserted) {
             stats.published++;
             recent.unshift({ themeId: theme.id, canonicalUrl: url, title: art.en.title }); // most recent first
+            await progress?.log(`Publié : ${art.fr.title}`);
           }
         } catch (e) {
           stats.errors.push(`${theme.slug} (writing "${c.title}"): ${(e as Error).message}`);
+          await progress?.log(`Échec de rédaction : ${c.title} (${(e as Error).message})`, "error");
         }
       }
+      await report("Thème terminé", themeProgress);
     }
+    await report("Terminé", { theme: null });
+    await progress?.settled();
 
     if (run.id) {
       await db
@@ -181,17 +223,21 @@ export async function runPipeline(opts: RunOptions) {
           status: stats.errors.length && !stats.published ? "error" : "ok",
           stats: { ...stats, usage: tracker.toJSON() },
           costUsd: tracker.tokenCostUsd.toFixed(4),
+          heartbeatAt: new Date(),
         })
         .where(eq(pipelineRuns.id, run.id));
     }
     return { stats, usage: tracker.toJSON() };
   } catch (e) {
     if (run.id) {
+      await progress?.log(`Échec : ${(e as Error).message}`, "error");
       await db
         .update(pipelineRuns)
         .set({ finishedAt: new Date(), status: "error", error: (e as Error).message, stats: { ...stats, usage: tracker.toJSON() } })
         .where(eq(pipelineRuns.id, run.id));
     }
     throw e;
+  } finally {
+    if (heartbeat) clearInterval(heartbeat);
   }
 }

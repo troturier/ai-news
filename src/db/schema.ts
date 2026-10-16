@@ -297,6 +297,25 @@ export const pipelineRuns = pgTable("pipeline_runs", {
   stats: jsonb("stats").$type<Record<string, unknown>>(),
   costUsd: numeric("cost_usd", { precision: 10, scale: 4 }),
   error: text("error"),
+  /** "manual" (admin button), "scheduled" (in-app scheduler) or "cli" (command line, including the former cron). */
+  trigger: text("trigger").notNull().default("cli"),
+  /** Live progress, written while the run is going (phase, counters, recent events). */
+  progress: jsonb("progress").$type<Record<string, unknown>>(),
+  /** Last progress write: a "running" run without a recent heartbeat is considered dead. */
+  heartbeatAt: timestamp("heartbeat_at").notNull().defaultNow(),
+});
+
+/** Single-row table (id = 1): pipeline schedule edited from the admin page. */
+export const pipelineSettings = pgTable("pipeline_settings", {
+  id: smallint("id").primaryKey().default(1),
+  /** Days between two scheduled runs; 0 = scheduler off (manual runs only). */
+  intervalDays: smallint("interval_days").notNull().default(7),
+  /** Hour of the day (Europe/Paris) at which a scheduled run starts. */
+  hour: smallint("hour").notNull().default(6),
+  maxPerTheme: smallint("max_per_theme").notNull().default(2),
+  /** Monthly budget in USD, used only for the estimate shown in the admin page. */
+  monthlyBudgetUsd: integer("monthly_budget_usd").notNull().default(100),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 /* -------------------------------------------------------------------------- */

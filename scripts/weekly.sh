@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Weekly task (user cron on the VPS): database backup,
-# article generation, then digest sending. Log: /opt/docker/ai-news/logs/weekly.log
+# Weekly task (user cron on the VPS): database backup, then digest sending.
+# Article generation is no longer run here: the app schedules it (frequency set in the admin page). Log: /opt/docker/ai-news/logs/weekly.log
 set -uo pipefail
 
 APP_DIR="${APP_DIR:-/opt/docker/ai-news}"
@@ -26,8 +26,7 @@ fi
 find "$BACKUP_DIR" -maxdepth 1 -name 'ai-news-*.sql.gz' -mtime +"$KEEP_DAYS" -delete
 
 # (--build: the "tools" image is rebuilt if the code changed since the last run)
-# 2) Article generation, 3) digest (even if generation fails: it will send what exists)
-$DC run --build --rm tools src/pipeline/cli.ts --max 2 || echo "ERROR: pipeline failed (code $?)" >&2
+# 2) Digest
 $DC run --build --rm tools src/pipeline/digest.ts || echo "ERROR: digest failed (code $?)" >&2
 
 echo "=== $(date -u '+%F %T') UTC: end"

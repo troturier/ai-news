@@ -2,7 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { IconLoader2, IconPlayerPlay } from "@tabler/icons-react";
 import { startPipelineRun } from "@/app/[lang]/admin/actions";
+import { fmtUsd } from "@/lib/pipeline-costs";
+import { WEB_SEARCH_USD } from "@/lib/pipeline-schedule";
 
 type Event = { at: string; level: "info" | "warn" | "error"; msg: string };
 type Progress = {
@@ -112,8 +115,9 @@ export function PipelineLive({ defaultMax, settingsVersion }: { defaultMax: numb
         </label>
         <button
           type="button" onClick={launch} disabled={running || pending}
-          className="rounded-md border border-black/20 px-3 py-1.5 text-sm font-medium disabled:opacity-50 dark:border-white/25"
+          className="flex items-center gap-1.5 rounded-md border border-black/20 px-3 py-1.5 text-sm font-medium disabled:opacity-50 dark:border-white/25"
         >
+          {running ? <IconLoader2 size={16} aria-hidden className="animate-spin" /> : <IconPlayerPlay size={16} aria-hidden />}
           {running ? "Recherche en cours…" : "Lancer une recherche maintenant"}
         </button>
         {message && <span role="alert" className="text-sm text-red-600">{message}</span>}
@@ -136,7 +140,11 @@ export function PipelineLive({ defaultMax, settingsVersion }: { defaultMax: numb
               Début {fmtTime(run.startedAt)} ·{" "}
               {fmtDuration((running ? serverNow : new Date(run.finishedAt ?? run.heartbeatAt).getTime()) - new Date(run.startedAt).getTime())}
             </span>
-            {p && <span className="opacity-70">{p.costUsd.toFixed(3)} $ de tokens · {p.webSearches} recherche(s) web</span>}
+            {p && (
+              <span className="opacity-70">
+                ≈ {fmtUsd(p.costUsd + p.webSearches * WEB_SEARCH_USD, 3)} (tokens {fmtUsd(p.costUsd, 3)} + {p.webSearches} recherche(s) web)
+              </span>
+            )}
           </div>
 
           {p && (

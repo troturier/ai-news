@@ -84,6 +84,15 @@ function parisWallClock(y: number, m: number, d: number, h: number) {
   return new Date(guess - parisOffsetMs(new Date(guess - parisOffsetMs(new Date(guess)))));
 }
 
+/** First instant of the calendar month (Paris) containing `at`. */
+export function startOfParisMonth(at: Date) {
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE, year: "numeric", month: "numeric" })
+      .formatToParts(at).map((x) => [x.type, Number(x.value)]),
+  );
+  return parisWallClock(p.year, p.month - 1, 1, 0);
+}
+
 /** Next scheduled start: `intervalDays` calendar days (Paris) after the baseline's day, at `hour`. */
 export function nextDueAt(baseline: Date, intervalDays: number, hour: number) {
   const p = Object.fromEntries(
